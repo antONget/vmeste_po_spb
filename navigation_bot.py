@@ -28,9 +28,10 @@ async def main():
     bot = Bot(token=config.tg_bot.token)
     dp = Dispatcher()
     # Регистрируем router в диспетчере
+    dp.include_router(user_handler.router)
     dp.include_router(admin_main_handlers.router)
     dp.include_router(admin_add_card_handlers.router)
-    dp.include_router(user_handler.router)
+
 
     # Пропускаем накопившиеся update и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)

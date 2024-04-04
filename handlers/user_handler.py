@@ -1,7 +1,7 @@
 import asyncio
 
 from aiogram import Router, F, Bot
-from aiogram.filters import CommandStart, StateFilter
+from aiogram.filters import CommandStart, StateFilter, or_f, and_f
 from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup, default_state
@@ -13,6 +13,7 @@ from module.data_base import get_list_category, get_list_subcategory, get_list_c
 from config_data.config import Config, load_config
 from keyboards.user_keyboards import keyboards_start_user, create_keyboard_list, keyboard_details, keyboard_full_text, \
     keyboard_full_text_1, keyboard_get_more
+from filter.admin_filter import chek_superadmin
 
 router = Router()
 # Загружаем конфиг в переменную config
@@ -27,7 +28,8 @@ class User(StatesGroup):
 user_dict = {}
 
 
-@router.message(CommandStart())
+@router.message(or_f(and_f(CommandStart(), lambda message: not chek_superadmin(message.chat.id)),
+                     and_f(lambda message: chek_superadmin(message.chat.id), F.text == '/user')))
 async def process_start_command_user(message: Message, state: FSMContext) -> None:
     logging.info(f'process_start_command_user: {message.chat.id}')
     create_table_users()
