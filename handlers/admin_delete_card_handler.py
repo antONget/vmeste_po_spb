@@ -29,10 +29,10 @@ async def process_add_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_add_card: {message.chat.id}')
     list_category = get_list_category()
     await message.answer(text=f'Выберите категорию заведение, из которого нужно удалить',
-                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='categorydelete'))
+                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='deletecategory'))
 
 
-@router.callback_query(F.data.startswith('categorydelete'))
+@router.callback_query(F.data.startswith('deletecategory'))
 async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
     list_subcategory = get_list_subcategory(callback.data.split(':')[1])
@@ -41,7 +41,7 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     if list_subcategory[0] != 'none':
         await callback.message.answer(text=f'Выберите подкатегорию места для удаления',
                                       reply_markup=create_keyboard_list(list_name_button=list_subcategory,
-                                                                        str_callback='subcategorydelete'))
+                                                                        str_callback='deletesubcategory'))
     else:
         list_card = get_list_card(category=callback.data.split(':')[1], subcategory='none')
         list_title_card = []
@@ -50,7 +50,7 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
         create_keyboard_list(list_name_button=list_title_card, str_callback='title_card')
 
 
-@router.callback_query(F.data.startswith('subcategorydelete'))
+@router.callback_query(F.data.startswith('deletesubcategory'))
 async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
     await state.update_data(subcategory=callback.data.split(':')[1])
