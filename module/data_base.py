@@ -153,11 +153,11 @@ def delete_card(title_card):
         db.commit()
 
 
-def set_attribute_card(attribute, set_attribute, title):
+def set_attribute_card(attribute, set_attribute, id_card):
     logging.info(f'set_attribute_card')
     with db:
         sql = db.cursor()
-        sql.execute(f'UPDATE places SET {attribute} = ? WHERE  title= ?', (set_attribute, title))
+        sql.execute(f'UPDATE places SET {attribute}= ? WHERE  id= ?', (set_attribute, id_card))
         db.commit()
 
 

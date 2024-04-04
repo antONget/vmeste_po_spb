@@ -75,6 +75,7 @@ async def process_select_title_card(callback: CallbackQuery, state: FSMContext) 
     logging.info(f'process_select_title_card: {callback.message.chat.id}')
     await state.update_data(title=callback.data.split(":")[1])
     card = info_card_title(title=callback.data.split(":")[1])
+    await state.update_data(id_card=card[0])
     media = []
     list_image = card[7].split(',')
     for image in list_image:
@@ -129,6 +130,7 @@ async def process_update_card(message: Message, state: FSMContext) -> None:
         await message.answer(text='Пришлите новое полное описание')
     elif message.text == 'Адрес':
         await message.answer(text='Пришлите новый адрес')
+    # print(message.text)
 
 
 @router.message(F.text, StateFilter(Admin.update_attribute), lambda message: chek_superadmin(message.chat.id))
@@ -136,20 +138,24 @@ async def process_update_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_update_card: {message.chat.id}')
     user_dict_admin[message.chat.id] = await state.get_data()
     attribute = user_dict_admin[message.chat.id]['attribute']
+    # print(attribute, user_dict_admin[message.chat.id]['title'])
     if attribute == 'Название':
         set_attribute_card(attribute='title',
                            set_attribute=message.text,
-                           title=user_dict_admin[message.chat.id]['title'])
+                           id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        await message.answer(text='Поле обновлено')
     elif attribute == 'Короткое описание':
         set_attribute_card(attribute='short_description',
                            set_attribute=message.text,
-                           title=user_dict_admin[message.chat.id]['title'])
+                           id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        await message.answer(text='Поле обновлено')
     elif attribute == 'Полное описание':
         set_attribute_card(attribute='long_description',
                            set_attribute=message.text,
-                           title=user_dict_admin[message.chat.id]['title'])
+                           id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        await message.answer(text='Поле обновлено')
     elif attribute == 'Адрес':
         set_attribute_card(attribute='address',
                            set_attribute=message.text,
-                           title=user_dict_admin[message.chat.id]['title'])
-    await message.answer(text='Поле обновлено')
+                           id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        await message.answer(text='Поле обновлено')
