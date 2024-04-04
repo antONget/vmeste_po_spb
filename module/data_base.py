@@ -137,9 +137,10 @@ def info_card(id_card):
         return card
 
 
-def delete_user(title_card):
-    logging.info(f'delete_user')
+def delete_card(title_card):
+    logging.info(f'delete_card')
     with db:
+        print(title_card)
         sql = db.cursor()
         sql.execute('DELETE FROM places WHERE title = ?', (title_card,))
         db.commit()
