@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 from config_data.config import Config, load_config
 from keyboards.admin_main_keyboards import keyboards_start_admin
-from module.data_base import create_table_users, create_table_place
+from module.data_base import create_table_users, create_table_place, get_list_card_stat
 from filter.admin_filter import chek_superadmin
 
 import logging
@@ -33,3 +33,14 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
                               f' правки контента',
                          reply_markup=keyboards_start_admin())
 
+
+@router.message(F.text == '📋 Статистика', lambda message: chek_superadmin(message.chat.id))
+async def process_get_stat(message: Message, state: FSMContext) -> None:
+    logging.info(f'process_add_card: {message.chat.id}')
+    stat = get_list_card_stat()
+    text = ''
+    for card in stat:
+        text += f'<b>{card[0]}:</b> {card[1]}\n'
+    await message.answer(text=f'Статистика:\n'
+                              f'{text}',
+                         parse_mode='html')

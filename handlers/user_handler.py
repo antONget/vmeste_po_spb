@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup, default_state
 
 import logging
 from module.data_base import get_list_category, get_list_subcategory, get_list_card, info_card, create_table_users, \
-    create_table_place
+    create_table_place, set_count_show_card
 from config_data.config import Config, load_config
 from keyboards.user_keyboards import keyboards_start_user, create_keyboard_list, keyboard_details, keyboard_full_text, \
     keyboard_full_text_1, keyboard_get_more
@@ -119,11 +119,8 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_details: {callback.message.chat.id}')
     id_card = callback.data.split(':')[1]
     card = info_card(int(id_card))
-    # media = []
-    # list_image = card[7].split(',')
-    # for image in list_image:
-    #     media.append(InputMediaPhoto(media=image))
-    # await callback.message.answer_media_group(media=media)
+    count = card[10] + 1
+    set_count_show_card(count, id_card)
     if card[5] != 'none':
         await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
                                               f'{card[3]}\n'

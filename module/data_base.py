@@ -129,6 +129,13 @@ def get_list_card(category, subcategory):
         return list_card
 
 
+def get_list_card_stat():
+    logging.info(f'get_list_card_stat')
+    with db:
+        sql = db.cursor()
+        list_card_stat = [category for category in sql.execute('SELECT title, count_link FROM places').fetchall()]
+        return list_card_stat
+
 def info_card(id_card):
     logging.info(f'info_card')
     with db:
@@ -158,6 +165,14 @@ def set_attribute_card(attribute, set_attribute, id_card):
     with db:
         sql = db.cursor()
         sql.execute(f'UPDATE places SET {attribute}= ? WHERE  id= ?', (set_attribute, id_card))
+        db.commit()
+
+
+def set_count_show_card(count, id_card):
+    logging.info(f'set_attribute_card')
+    with db:
+        sql = db.cursor()
+        sql.execute(f'UPDATE places SET count_link= ? WHERE  id= ?', (count, id_card))
         db.commit()
 
 
