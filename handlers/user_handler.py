@@ -124,15 +124,15 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
         media.append(InputMediaPhoto(media=image))
     await callback.message.answer_media_group(media=media)
     if card[5] != 'none':
-        await callback.message.answer(text=f'<b>{card[1]}</b>\n'
-                                           f'{card[3]}\n'
-                                           f'<i>{card[4]}</i>',
-                                      reply_markup=keyboard_full_text(card[6],
+        await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
+                                              f'{card[3]}\n'
+                                              f'<i>{card[4]}</i>',
+                                         reply_markup=keyboard_full_text(card[6],
                                                                       card[5]),
-                                      parse_mode='html')
+                                         parse_mode='html')
     else:
-        await callback.message.answer(text=f'<b>{card[1]}</b>\n'
-                                           f'{card[3]}\n'
-                                           f'<i>{card[4]}</i>',
-                                      reply_markup=keyboard_full_text_1(card[6]),
-                                      parse_mode='html')
+        await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
+                                              f'{card[3]}\n'
+                                              f'<i>{card[4]}</i>',
+                                         reply_markup=keyboard_full_text_1(card[6]),
+                                         parse_mode='html')
