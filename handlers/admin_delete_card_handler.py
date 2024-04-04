@@ -30,7 +30,6 @@ async def process_add_card(message: Message, state: FSMContext) -> None:
     list_category = get_list_category()
     await message.answer(text=f'Выберите категорию заведение, из которого нужно удалить',
                          reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='categorydelete'))
-    await state.set_state(Admin.category_card)
 
 
 @router.callback_query(F.data.startswith('categorydelete'))
