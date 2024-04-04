@@ -118,17 +118,16 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_details: {callback.message.chat.id}')
     id_card = callback.data.split(':')[1]
     card = info_card(int(id_card))
-    media = []
-    list_image = card[7].split(',')
-    for image in list_image:
-        media.append(InputMediaPhoto(media=image))
-    await callback.message.answer_media_group(media=media)
+    # media = []
+    # list_image = card[7].split(',')
+    # for image in list_image:
+    #     media.append(InputMediaPhoto(media=image))
+    # await callback.message.answer_media_group(media=media)
     if card[5] != 'none':
         await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
                                               f'{card[3]}\n'
                                               f'<i>{card[4]}</i>',
-                                         reply_markup=keyboard_full_text(card[6],
-                                                                      card[5]),
+                                         reply_markup=keyboard_full_text(card[6], card[5]),
                                          parse_mode='html')
     else:
         await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
