@@ -36,7 +36,7 @@ def keyboard_details(id_card):
 
 def keyboard_get_more():
     logging.info("keyboard_get_more")
-    button_1 = InlineKeyboardButton(text='Получить еще',  callback_data=f'get_more')
+    button_1 = InlineKeyboardButton(text='Покажите еще 3',  callback_data=f'get_more')
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1]], )
     return keyboard
 

@@ -50,10 +50,11 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
 async def show_card(callback: CallbackQuery, state: FSMContext, list_card) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
     print('list_card', list_card)
+    count_show = 3
     user_dict[callback.message.chat.id] = await state.get_data()
-    count_card_show = user_dict[callback.message.chat.id]['count_card_show'] + 2
+    count_card_show = user_dict[callback.message.chat.id]['count_card_show'] + count_show
     await state.update_data(count_card_show=count_card_show)
-    for info_card in list_card[count_card_show - 2:count_card_show]:
+    for info_card in list_card[count_card_show - count_show:count_card_show]:
         media = []
         list_image = info_card[7].split(',')
         for image in list_image:
@@ -65,7 +66,7 @@ async def show_card(callback: CallbackQuery, state: FSMContext, list_card) -> No
                                       reply_markup=keyboard_details(info_card[0]),
                                       parse_mode='html')
     if len(list_card) > count_card_show:
-        await callback.message.answer(text='Посмотреть ещe',
+        await callback.message.answer(text='Не хватило мест?',
                                       reply_markup=keyboard_get_more())
 
 
