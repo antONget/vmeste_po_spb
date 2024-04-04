@@ -1,0 +1,155 @@
+from aiogram import Router, F, Bot
+from aiogram.filters import CommandStart, StateFilter
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup, default_state
+
+
+from config_data.config import Config, load_config
+from keyboards.admin_edit_card_keyboard import create_keyboard_list, keyboard_details_edit, keyboards_edit_attribute, \
+    keyboard_full_text, keyboard_full_text_1
+from keyboards.admin_main_keyboards import keyboards_start_admin
+from module.data_base import get_list_category, get_list_subcategory, get_list_card, delete_card, info_card_title, \
+    info_card, set_attribute_card
+from filter.admin_filter import chek_superadmin
+
+
+import logging
+
+router = Router()
+config: Config = load_config()
+
+
+class Admin(StatesGroup):
+    update_attribute = State()
+
+
+user_dict_admin = {}
+
+
+@router.message(F.text == '📝 Редактировать карточку', lambda message: chek_superadmin(message.chat.id))
+async def process_edit_card(message: Message, state: FSMContext) -> None:
+    logging.info(f'process_edit_card: {message.chat.id}')
+    list_category = get_list_category()
+    await message.answer(text=f'Выберите категорию заведение, из которого нужно изменить',
+                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='editcategory'))
+
+
+@router.callback_query(F.data.startswith('editcategory'))
+async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_select_category_card: {callback.message.chat.id}')
+    list_subcategory = get_list_subcategory(callback.data.split(':')[1])
+    await state.update_data(category=callback.data.split(':')[1])
+    print(list_subcategory)
+    if list_subcategory[0] != 'none':
+        await callback.message.answer(text=f'Выберите подкатегорию места для редактирования',
+                                      reply_markup=create_keyboard_list(list_name_button=list_subcategory,
+                                                                        str_callback='editsubcategory'))
+    else:
+        list_card = get_list_card(category=callback.data.split(':')[1], subcategory='none')
+        list_title_card = []
+        for card in list_card:
+            list_title_card.append(card[1])
+        await callback.message.answer(text='Выберите заведение для редактирования',
+                                      reply_markup=
+                                      create_keyboard_list(list_name_button=list_title_card, str_callback='edittitle_card'))
+
+
+@router.callback_query(F.data.startswith('editsubcategory'))
+async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_select_category_card: {callback.message.chat.id}')
+    await state.update_data(subcategory=callback.data.split(':')[1])
+    user_dict_admin[callback.message.chat.id] = await state.get_data()
+    list_card = get_list_card(user_dict_admin[callback.message.chat.id]['category'],
+                              user_dict_admin[callback.message.chat.id]['subcategory'])
+    list_title_card = []
+    for card in list_card:
+        list_title_card.append(card[1])
+    await callback.message.answer(text='Выберите заведение для редактирования',
+                                  reply_markup=
+                                  create_keyboard_list(list_name_button=list_title_card, str_callback='edittitle_card'))
+
+
+@router.callback_query(F.data.startswith('edittitle_card'))
+async def process_select_title_card(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_select_title_card: {callback.message.chat.id}')
+    await state.update_data(title=callback.data.split(":")[1])
+    card = info_card_title(title=callback.data.split(":")[1])
+    media = []
+    list_image = card[7].split(',')
+    for image in list_image:
+        print(image)
+        media.append(InputMediaPhoto(media=image))
+    await callback.message.answer_media_group(media=media)
+    await callback.message.answer(text=f'<b>{card[1]}</b>\n'
+                                       f'{card[2]}',
+                                  reply_markup=keyboard_details_edit(card[0]),
+                                  parse_mode='html')
+    await callback.message.answer(text='Выберите поля для редактирования',
+                                  reply_markup=keyboards_edit_attribute())
+
+
+@router.callback_query(F.data.startswith('details_edit:'))
+async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_details: {callback.message.chat.id}')
+    id_card = callback.data.split(':')[1]
+    card = info_card(int(id_card))
+    if card[5] != 'none':
+        await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
+                                              f'{card[3]}\n'
+                                              f'<i>{card[4]}</i>',
+                                         reply_markup=keyboard_full_text(card[6], card[5]),
+                                         parse_mode='html')
+    else:
+        await callback.message.edit_text(text=f'<b>{card[1]}</b>\n'
+                                              f'{card[3]}\n'
+                                              f'<i>{card[4]}</i>',
+                                         reply_markup=keyboard_full_text_1(card[6]),
+                                         parse_mode='html')
+
+
+@router.message(F.text == 'Главное меню', lambda message: chek_superadmin(message.chat.id))
+async def process_back_menu(message: Message, state: FSMContext) -> None:
+    logging.info(f'process_back_menu: {message.chat.id}')
+    await message.answer(text='Выберите раздел',
+                         reply_markup=keyboards_start_admin())
+
+
+@router.message(lambda message: message.text in ['Название', 'Короткое описание', 'Полное описание', 'Адрес'],
+                lambda message: chek_superadmin(message.chat.id))
+async def process_update_card(message: Message, state: FSMContext) -> None:
+    logging.info(f'process_update_card: {message.chat.id}')
+    await state.set_state(Admin.update_attribute)
+    await state.update_data(attribute=message.text)
+    if message.text == 'Название':
+        await message.answer(text='Пришлите новое название:')
+    elif message.text == 'Короткое описание':
+        await message.answer(text='Пришлите новое короткое описание')
+    elif message.text == 'Полное описание':
+        await message.answer(text='Пришлите новое полное описание')
+    elif message.text == 'Адрес':
+        await message.answer(text='Пришлите новый адрес')
+
+
+@router.message(F.text, StateFilter(Admin.update_attribute), lambda message: chek_superadmin(message.chat.id))
+async def process_update_card(message: Message, state: FSMContext) -> None:
+    logging.info(f'process_update_card: {message.chat.id}')
+    user_dict_admin[message.chat.id] = await state.get_data()
+    attribute = user_dict_admin[message.chat.id]['attribute']
+    if attribute == 'Название':
+        set_attribute_card(attribute='title',
+                           set_attribute=message.text,
+                           title=user_dict_admin[message.chat.id]['title'])
+    elif attribute == 'Короткое описание':
+        set_attribute_card(attribute='short_description',
+                           set_attribute=message.text,
+                           title=user_dict_admin[message.chat.id]['title'])
+    elif attribute == 'Полное описание':
+        set_attribute_card(attribute='long_description',
+                           set_attribute=message.text,
+                           title=user_dict_admin[message.chat.id]['title'])
+    elif attribute == 'Адрес':
+        set_attribute_card(attribute='address',
+                           set_attribute=message.text,
+                           title=user_dict_admin[message.chat.id]['title'])
+    await message.answer(text='Поле обновлено')

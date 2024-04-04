@@ -137,12 +137,27 @@ def info_card(id_card):
         return card
 
 
+def info_card_title(title):
+    logging.info(f'info_card')
+    with db:
+        sql = db.cursor()
+        card = sql.execute('SELECT * FROM places WHERE title=?', (title,)).fetchone()
+        return card
+
 def delete_card(title_card):
     logging.info(f'delete_card')
     with db:
         print(title_card)
         sql = db.cursor()
         sql.execute('DELETE FROM places WHERE title = ?', (title_card,))
+        db.commit()
+
+
+def set_attribute_card(attribute, set_attribute, title):
+    logging.info(f'set_attribute_card')
+    with db:
+        sql = db.cursor()
+        sql.execute(f'UPDATE places SET {attribute} = ? WHERE  title= ?', (set_attribute, title))
         db.commit()
 
 
