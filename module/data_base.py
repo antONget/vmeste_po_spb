@@ -137,6 +137,14 @@ def info_card(id_card):
         return card
 
 
+def delete_user(title_card):
+    logging.info(f'delete_user')
+    with db:
+        sql = db.cursor()
+        sql.execute('DELETE FROM places WHERE title = ?', (title_card,))
+        db.commit()
+
+
 def add_super_admin(id_admin, user_name) -> None:
     """
     Добавление суперадмина в таблицу пользователей
