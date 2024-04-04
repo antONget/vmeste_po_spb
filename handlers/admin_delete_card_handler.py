@@ -83,3 +83,8 @@ async def process_yes_delete_title_card(callback: CallbackQuery, state: FSMConte
     delete_card(user_dict_admin[callback.message.chat.id]['title'])
     await callback.message.answer(text=f'Заведение {user_dict_admin[callback.message.chat.id]["title"]} успешно '
                                        f'удалено')
+
+@router.callback_query(F.data == 'no_delete')
+async def process_yes_delete_title_card(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_yes_delete_title_card: {callback.message.chat.id}')
+    await callback.message.answer(text='Удаление отменено')
