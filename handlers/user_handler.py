@@ -44,7 +44,7 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
     logging.info(f'process_start_command_user: {message.chat.id}')
     list_category = get_list_category()
     await message.answer(text=f'Выберите категорию места',
-                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='category'))
+                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='usercategory'))
 
 
 async def show_card(callback: CallbackQuery, state: FSMContext, list_card) -> None:
@@ -79,7 +79,7 @@ async def process_select_get_more(callback: CallbackQuery, state: FSMContext) ->
     await show_card(callback=callback, state=state, list_card=list_card)
 
 
-@router.callback_query(F.data.startswith('category'))
+@router.callback_query(F.data.startswith('usercategory'))
 async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
     list_subcategory = get_list_subcategory(callback.data.split(':')[1])
@@ -88,7 +88,7 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     if list_subcategory[0] != 'none':
         await callback.message.answer(text=f'Выберите подкатегорию места',
                                       reply_markup=create_keyboard_list(list_name_button=list_subcategory,
-                                                                        str_callback='subcategory'))
+                                                                        str_callback='usersubcategory'))
     else:
         await callback.message.answer(text=f'Подкатегорий у категории нет')
         await state.update_data(subcategory='none')
@@ -100,7 +100,7 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
         await show_card(callback=callback, state=state, list_card=list_card)
 
 
-@router.callback_query(F.data.startswith('subcategory'))
+@router.callback_query(F.data.startswith('usersubcategory'))
 async def process_select_category_card(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
     await state.update_data(subcategory=callback.data.split(':')[1])

@@ -38,6 +38,7 @@ async def process_add_card(message: Message, state: FSMContext) -> None:
     list_category = get_list_category()
     await message.answer(text=f'Введите категорию места или выберите из ранее добавленных',
                          reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='category'))
+    await state.update_data(image_id_list_image=[])
     await state.set_state(Admin.category_card)
 
 
