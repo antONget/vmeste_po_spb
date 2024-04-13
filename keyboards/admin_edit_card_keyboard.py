@@ -4,12 +4,16 @@ import logging
 import validators
 
 
-def create_keyboard_list(list_name_button, str_callback):
+def create_keyboard_list(list_name_button, str_callback, list_id_button: list = []):
     logging.info("create_keyboard_list")
     kb_builder = InlineKeyboardBuilder()
     list_button = []
-    for i, value in enumerate(list_name_button):
-        list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
+    if list_id_button == []:
+        for i, value in enumerate(list_name_button):
+            list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
+    else:
+        for i, value in enumerate(list_name_button):
+            list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{list_id_button[i]}'))
     # Распаковываем список с кнопками в билдер методом row c параметром width
     kb_builder.row(*list_button, width=1)
     # Возвращаем объект инлайн-клавиатуры

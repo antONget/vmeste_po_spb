@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from config_data.config import Config, load_config
 from handlers import admin_main_handlers, admin_add_card_handlers, user_handler, admin_delete_card_handler, \
-    admin_edit_card_handler
+    admin_edit_card_handler, other_handlers
 # Инициализируем logger
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ async def main():
     dp.include_router(admin_add_card_handlers.router)
     dp.include_router(admin_delete_card_handler.router)
     dp.include_router(admin_edit_card_handler.router)
+    dp.include_router(other_handlers.router)
 
 
     # Пропускаем накопившиеся update и запускаем polling
