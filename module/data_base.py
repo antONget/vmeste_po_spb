@@ -44,7 +44,8 @@ def create_table_place() -> None:
             list_image TEXT,
             category TEXT,
             sub_category TEXT,
-            count_link INTEGER
+            count_link INTEGER,
+            position INTEGER DEFAULT -1
         )""")
         db.commit()
 
@@ -111,9 +112,10 @@ def get_list_category_():
 def get_list_subcategory(category):
     logging.info(f'get_list_subcategory')
     with db:
+        print(category)
         sql = db.cursor()
         list_subcategory = [subcategory[0] for subcategory in sql.execute('SELECT sub_category FROM places WHERE category=? ORDER BY id', (category,)).fetchall()]
-
+        print(list_subcategory)
         list_subcategory_uniq = []
         for subcategory in list_subcategory:
             if list_subcategory_uniq.count(subcategory) == 0:
@@ -126,7 +128,16 @@ def get_list_card(category, subcategory):
     with db:
         sql = db.cursor()
         list_card = [card for card in sql.execute('SELECT * FROM places WHERE category=? AND sub_category=? ORDER BY id', (category, subcategory)).fetchall()]
-        return list_card
+        list_card_sort = []
+        list_card_top = []
+        for card in list_card:
+            if card[-1] == -1:
+                list_card_sort.append(card)
+            else:
+                list_card_top.append(card)
+        list_card_top.sort(key=lambda x: x[-1])
+        list_card_top += list_card_sort
+        return list_card_top
 
 
 def get_list_card_stat():
@@ -151,12 +162,14 @@ def info_card_title(title):
         card = sql.execute('SELECT * FROM places WHERE title=?', (title,)).fetchone()
         return card
 
-def delete_card(title_card):
+
+def delete_card(title_card: str):
     logging.info(f'delete_card')
     with db:
         print(title_card)
         sql = db.cursor()
-        sql.execute('DELETE FROM places WHERE title = ?', (title_card,))
+        sql.execute('DELETE FROM places WHERE id = ?', (int(title_card),))
+        # sql.execute(f'DELETE FROM places WHERE title LIKE "{title_card}"')
         db.commit()
 
 
@@ -165,6 +178,17 @@ def set_attribute_card(attribute, set_attribute, id_card):
     with db:
         sql = db.cursor()
         sql.execute(f'UPDATE places SET {attribute}= ? WHERE  id= ?', (set_attribute, id_card))
+        db.commit()
+
+
+def set_position_card(category: str, subcategory: str, id_card: int):
+    logging.info(f'set_attribute_card')
+    list_card_top = get_list_card(category, subcategory)
+    with db:
+        sql = db.cursor()
+        for card in list_card_top:
+            sql.execute(f'UPDATE places SET position= ? WHERE  id= ? AND NOT position=?', (card[-1]+1, card[0], -1))
+        sql.execute(f'UPDATE places SET position= ? WHERE  id= ?', (0, id_card))
         db.commit()
 
 

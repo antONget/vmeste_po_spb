@@ -29,13 +29,15 @@ def keyboard_details_edit(id_card):
 
 def keyboards_edit_attribute():
     logging.info("keyboards_start_admin")
+    button_0 = KeyboardButton(text='Категория')
     button_1 = KeyboardButton(text='Название')
     button_3 = KeyboardButton(text='Короткое описание')
     button_4 = KeyboardButton(text='Полное описание')
     button_5 = KeyboardButton(text='Адрес')
+    button_top = KeyboardButton(text='Поднять в TOP')
     button_6 = KeyboardButton(text='Главное меню')
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[[button_1], [button_3], [button_4], [button_5], [button_6]],
+        keyboard=[[button_0], [button_1], [button_3], [button_4], [button_5], [button_top], [button_6]],
         resize_keyboard=True
     )
     return keyboard

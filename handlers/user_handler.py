@@ -42,7 +42,7 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
 @router.message(F.text == 'Выбрать место')
 async def process_start_command_user(message: Message, state: FSMContext) -> None:
     logging.info(f'process_start_command_user: {message.chat.id}')
-    list_category = get_list_category()
+    list_category: list = get_list_category()
     await message.answer(text=f'Выберите категорию места',
                          reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='usercategory'))
 
