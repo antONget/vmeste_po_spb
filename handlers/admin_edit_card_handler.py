@@ -67,11 +67,15 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     list_card = get_list_card(user_dict_admin[callback.message.chat.id]['category'],
                               user_dict_admin[callback.message.chat.id]['subcategory'])
     list_title_card = []
+    list_id_card = []
     for card in list_card:
         list_title_card.append(card[1])
+        list_id_card.append(card[0])
     await callback.message.answer(text='Выберите заведение для редактирования',
                                   reply_markup=
-                                  create_keyboard_list(list_name_button=list_title_card, str_callback='edittitle_card'))
+                                  create_keyboard_list(list_name_button=list_title_card,
+                                                       str_callback='edittitle_card',
+                                                       list_id_button=list_id_card))
 
 
 @router.callback_query(F.data.startswith('edittitle_card'))
