@@ -126,7 +126,7 @@ async def process_continue_image(callback: CallbackQuery, state: FSMContext) -> 
 async def process_get_title_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_get_title_card: {message.chat.id}')
     await state.set_state(default_state)
-    await state.update_data(title_card=message.text)
+    await state.update_data(title_card=message.text.replace('"', ''))
     await message.answer(text=f'Пришлите короткое описание')
     await state.set_state(Admin.short_card)
 
@@ -135,7 +135,7 @@ async def process_get_title_card(message: Message, state: FSMContext) -> None:
 async def process_get_short_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_get_short_card: {message.chat.id}')
     await state.set_state(default_state)
-    await state.update_data(short_card=message.text)
+    await state.update_data(short_card=message.text.replace('"', ''))
     await message.answer(text=f'Пришлите полное описание')
     await state.set_state(Admin.long_card)
 
@@ -144,7 +144,7 @@ async def process_get_short_card(message: Message, state: FSMContext) -> None:
 async def process_get_long_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_get_long_card: {message.chat.id}')
     await state.set_state(default_state)
-    await state.update_data(long_card=message.text)
+    await state.update_data(long_card=message.text.replace('"', ''))
     await message.answer(text=f'Пришлите адрес')
     await state.set_state(Admin.address_card)
 
@@ -153,7 +153,7 @@ async def process_get_long_card(message: Message, state: FSMContext) -> None:
 async def process_get_address_card(message: Message, state: FSMContext) -> None:
     logging.info(f'process_get_address_card: {message.chat.id}')
     await state.set_state(default_state)
-    await state.update_data(address_card=message.text)
+    await state.update_data(address_card=message.text.replace('"', ''))
     await message.answer(text=f'Пришлите ссылку на место в яндекс картах')
     await state.set_state(Admin.yandex_card)
 
