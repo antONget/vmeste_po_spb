@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup, default_state
 
 import logging
 from module.data_base import get_list_category, get_list_subcategory, get_list_card, info_card, create_table_users, \
-    create_table_place, set_count_show_card
+    create_table_place, set_count_show_card, add_user
 from config_data.config import Config, load_config
 from keyboards.user_keyboards import keyboards_start_user, create_keyboard_list, keyboard_details, keyboard_full_text, \
     keyboard_full_text_1, keyboard_get_more
@@ -34,6 +34,7 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
     logging.info(f'process_start_command_user: {message.chat.id}')
     create_table_users()
     create_table_place()
+    add_user(telegram_id=message.chat.id, username=message.from_user.username)
     await state.update_data(user_name=message.from_user.username)
     await message.answer(text=f'приветственное сообщение и предложение выбрать меню.',
                          reply_markup=keyboards_start_user())
