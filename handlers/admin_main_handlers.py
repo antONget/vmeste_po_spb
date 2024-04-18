@@ -9,7 +9,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 from config_data.config import Config, load_config
 from keyboards.admin_main_keyboards import keyboards_start_admin
-from module.data_base import create_table_users, create_table_place, get_list_card_stat
+from module.data_base import create_table_users, create_table_place, get_list_card_stat, get_list_users
 from filter.admin_filter import chek_superadmin
 
 import logging
@@ -44,3 +44,5 @@ async def process_get_stat(message: Message, state: FSMContext) -> None:
     await message.answer(text=f'Статистика:\n'
                               f'{text}',
                          parse_mode='html')
+    list_id_username = get_list_users()
+    await message.answer(text=f'Количество уникальных пользователей: {len(list_id_username)}')
