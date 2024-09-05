@@ -145,12 +145,22 @@ def get_list_card(category, subcategory):
         return list_card_top
 
 
+def get_list_card_event():
+    logging.info(f'get_list_card_event')
+    with db:
+        sql = db.cursor()
+        list_card = [card for card in sql.execute('SELECT * FROM places WHERE category=? ORDER BY id',
+                                                  ("🎧Мероприятия недели",)).fetchall()]
+        return list_card
+
+
 def get_list_card_stat():
     logging.info(f'get_list_card_stat')
     with db:
         sql = db.cursor()
         list_card_stat = [category for category in sql.execute('SELECT title, count_link FROM places').fetchall()]
         return list_card_stat
+
 
 def info_card(id_card):
     logging.info(f'info_card')
