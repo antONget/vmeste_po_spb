@@ -49,6 +49,7 @@ def create_table_place() -> None:
         )""")
         db.commit()
 
+
 def create_table_category() -> None:
     logging.info("create_table_place")
     with db:
@@ -86,10 +87,14 @@ def add_category(category) -> None:
 
 
 def get_list_category():
+    """
+    Получаем список категорий
+    :return:
+    """
     logging.info(f'get_list_category')
     with db:
         sql = db.cursor()
-        list_category = [category[0] for category in sql.execute('SELECT category FROM places ORDER BY id').fetchall()]
+        list_category = [category[0] for category in sql.execute('SELECT category FROM places ORDER BY pos_cat').fetchall()]
         list_category_uniq = []
         for category in list_category:
             if list_category_uniq.count(category) == 0:
@@ -182,13 +187,42 @@ def set_attribute_card(attribute, set_attribute, id_card):
 
 
 def set_position_card(category: str, subcategory: str, id_card: int):
+    """
+    Устанавливаем позицию карточки
+    :param category:
+    :param subcategory:
+    :param id_card:
+    :return:
+    """
     logging.info(f'set_attribute_card')
+    # получаем список карточек в выбранной категории и подкатегории
     list_card_top = get_list_card(category, subcategory)
     with db:
         sql = db.cursor()
+        # обновляем позицию карточек
         for card in list_card_top:
+            # обновляем позицию карточку
             sql.execute(f'UPDATE places SET position= ? WHERE  id= ? AND NOT position=?', (card[-1]+1, card[0], -1))
         sql.execute(f'UPDATE places SET position= ? WHERE  id= ?', (0, id_card))
+        db.commit()
+
+
+def set_position_category(category: str):
+    """
+    Устанавливаем позицию карточки
+    :param category:
+    :return:
+    """
+    logging.info(f'set_attribute_card')
+    # получаем список карточек в выбранной категории и подкатегории
+    list_category_top = get_list_category()
+    with db:
+        sql = db.cursor()
+        # обновляем позицию карточек
+        for category in list_category_top:
+            pos_cat = sql.execute('SELECT pos_cat FROM places WHERE category=?', (category,)).fetchone()
+            sql.execute(f'UPDATE places SET pos_cat= ? WHERE  category= ?', (pos_cat[0]+1, category))
+        sql.execute(f'UPDATE places SET pos_cat= ? WHERE  category= ?', (0, category))
         db.commit()
 
 
