@@ -5,9 +5,11 @@ import validators
 
 
 def create_keyboard_list(list_name_button, str_callback, list_id_button: list = []):
-    logging.info("create_keyboard_list")
+    logging.info(f"create_keyboard_list, {str_callback}")
     kb_builder = InlineKeyboardBuilder()
     list_button = []
+    if str_callback in ['edittitle_card', 'editsubcategory'] :
+        list_button.append(InlineKeyboardButton(text='Поднять в TOP', callback_data=f'top_category'))
     if list_id_button == []:
         for i, value in enumerate(list_name_button):
             list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
