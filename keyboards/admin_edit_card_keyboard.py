@@ -12,6 +12,8 @@ def create_keyboard_list(list_name_button, str_callback, list_id_button: list = 
         list_button.append(InlineKeyboardButton(text='Поднять в TOP', callback_data=f'top_category'))
     if list_id_button == []:
         for i, value in enumerate(list_name_button):
+            if 'Мероприятия недели' in value:
+                continue
             list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
     else:
         for i, value in enumerate(list_name_button):
