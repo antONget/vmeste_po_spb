@@ -28,3 +28,7 @@ async def all_message(message: Message) -> None:
     if message.text == '/get_logfile':
         file_path = "py_log.log"
         await message.answer_document(FSInputFile(file_path))
+
+    if message.text == '/get_dbfile':
+        file_path = "navigation.db"
+        await message.answer_document(FSInputFile(file_path))
