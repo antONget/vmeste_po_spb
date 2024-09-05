@@ -36,6 +36,23 @@ def create_keyboard_list(list_name_button, str_callback):
     return kb_builder.as_markup()
 
 
+def create_keyboard_list_event(list_name_button):
+    """
+    Клавиатура списка категорий
+    :param list_name_button:
+    :param str_callback:
+    :return:
+    """
+    logging.info("create_keyboard_list")
+    kb_builder = InlineKeyboardBuilder()
+    list_button = []
+    for i, value in enumerate(list_name_button):
+        list_button.append(InlineKeyboardButton(text=value[1], callback_data=f'event_{value[0]}'))
+    # Распаковываем список с кнопками в билдер методом row c параметром width
+    kb_builder.row(*list_button, width=1)
+    # Возвращаем объект инлайн-клавиатуры
+    return kb_builder.as_markup()
+
 def keyboard_details(id_card):
     logging.info("keyboard_details")
     button_1 = InlineKeyboardButton(text='Узнать больше',  callback_data=f'details_user:{id_card}')
