@@ -9,10 +9,10 @@ from aiogram.fsm.state import State, StatesGroup, default_state
 
 import logging
 from module.data_base import get_list_category, get_list_subcategory, get_list_card, info_card, create_table_users, \
-    create_table_place, set_count_show_card, add_user
+    create_table_place, set_count_show_card, add_user, get_list_card_event
 from config_data.config import Config, load_config
 from keyboards.user_keyboards import keyboards_start_user, create_keyboard_list, keyboard_details, keyboard_full_text, \
-    keyboard_full_text_1, keyboard_get_more
+    keyboard_full_text_1, keyboard_get_more, create_keyboard_list_event
 from filter.admin_filter import chek_superadmin
 
 router = Router()
@@ -50,16 +50,17 @@ async def process_start_command_user(message: Message, state: FSMContext) -> Non
 
 
 @router.message(F.text == 'Выбрать место')
-async def process_start_command_user(message: Message, state: FSMContext) -> None:
+async def process_start_command_user(message: Message) -> None:
     logging.info(f'process_start_command_user: {message.chat.id}')
     list_category: list = get_list_category()
     await message.answer(text=f'Выберите категорию места',
-                         reply_markup=create_keyboard_list(list_name_button=list_category, str_callback='usercategory'))
+                         reply_markup=create_keyboard_list(list_name_button=list_category,
+                                                           str_callback='usercategory'))
 
 
 async def show_card(callback: CallbackQuery, state: FSMContext, list_card) -> None:
     logging.info(f'process_select_category_card: {callback.message.chat.id}')
-    print('list_card', list_card)
+    # print('list_card', list_card)
     count_show = 3
     user_dict[callback.message.chat.id] = await state.get_data()
     count_card_show = user_dict[callback.message.chat.id]['count_card_show'] + count_show
@@ -78,7 +79,6 @@ async def show_card(callback: CallbackQuery, state: FSMContext, list_card) -> No
     if len(list_card) > count_card_show:
         await callback.message.answer(text='Не хватило мест?',
                                       reply_markup=keyboard_get_more())
-
 
 
 @router.callback_query(F.data == 'get_more')
@@ -122,8 +122,6 @@ async def process_select_category_card(callback: CallbackQuery, state: FSMContex
     await show_card(callback=callback, state=state, list_card=list_card)
 
 
-
-
 @router.callback_query(F.data.startswith('details_user:'))
 async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
     logging.info(f'process_details: {callback.message.chat.id}')
@@ -143,3 +141,35 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
                                               f'<i>{card[4]}</i>',
                                          reply_markup=keyboard_full_text_1(card[6]),
                                          parse_mode='html')
+
+
+@router.message(F.text == '🎧Мероприятия недели')
+async def process_events_week(message: Message) -> None:
+    logging.info(f'process_events_week: {message.chat.id}')
+    list_event: list = get_list_card_event()
+    print(list_event)
+    await message.answer(text=f'Выберите мероприятие',
+                         reply_markup=create_keyboard_list_event(list_name_button=list_event))
+
+
+@router.callback_query(F.data.startswith('event_'))
+async def process_event_show(callback: CallbackQuery) -> None:
+    logging.info(f'process_event_show: {callback.message.chat.id}')
+    info_event = info_card(id_card=int(callback.data.split('_')[1]))
+    media = []
+    list_image = info_event[7].split(',')
+    for image in list_image:
+        print(image)
+        media.append(InputMediaPhoto(media=image))
+    await callback.message.answer_media_group(media=media)
+    await callback.message.answer(text=f'<b>{info_event[1]}</b>\n'
+                                       f'{info_event[2]}',
+                                  reply_markup=keyboard_details(info_event[0]),
+                                  parse_mode='html')
+
+
+@router.message(F.text == 'Задать вопрос')
+async def process_question(message: Message) -> None:
+    logging.info(f'process_question: {message.chat.id}')
+    await message.answer(text='Если у вас возникли вопросы по работе бота или у вас есть предложения,'
+                              ' то можете написать @legeau')
