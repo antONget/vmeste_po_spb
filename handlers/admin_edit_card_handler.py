@@ -10,7 +10,7 @@ from keyboards.admin_edit_card_keyboard import create_keyboard_list, keyboard_de
     keyboard_full_text, keyboard_full_text_1
 from keyboards.admin_main_keyboards import keyboards_start_admin
 from module.data_base import get_list_category, get_list_subcategory, get_list_card, \
-    info_card, set_attribute_card, set_position_card
+    info_card, set_attribute_card, set_position_card, set_position_category
 from filter.admin_filter import chek_superadmin
 
 
@@ -34,6 +34,14 @@ async def process_edit_card(message: Message) -> None:
     await message.answer(text=f'Выберите категорию заведение, из которого нужно изменить',
                          reply_markup=create_keyboard_list(list_name_button=list_category,
                                                            str_callback='editcategory'))
+
+
+@router.callback_query(F.data == 'top_category')
+async def process_top_category(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_top_category: {callback.message.chat.id} {callback.data}')
+    data = await state.get_data()
+    set_position_category(category=data['category'])
+    await callback.answer(text='Позиция категории обновлена', show_alert=True)
 
 
 @router.callback_query(F.data.startswith('editcategory'))
