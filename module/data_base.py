@@ -213,15 +213,15 @@ def set_position_category(category: str):
     :param category:
     :return:
     """
-    logging.info(f'set_attribute_card')
+    logging.info(f'set_attribute_card {category}')
     # получаем список карточек в выбранной категории и подкатегории
     list_category_top = get_list_category()
     with db:
         sql = db.cursor()
         # обновляем позицию карточек
-        for category in list_category_top:
-            pos_cat = sql.execute('SELECT pos_cat FROM places WHERE category=?', (category,)).fetchone()
-            sql.execute(f'UPDATE places SET pos_cat= ? WHERE  category= ?', (pos_cat[0]+1, category))
+        for cat in list_category_top:
+            pos_cat = sql.execute('SELECT pos_cat FROM places WHERE category=?', (cat,)).fetchone()
+            sql.execute(f'UPDATE places SET pos_cat= ? WHERE  category= ?', (pos_cat[0]+1, cat))
         sql.execute(f'UPDATE places SET pos_cat= ? WHERE  category= ?', (0, category))
         db.commit()
 
