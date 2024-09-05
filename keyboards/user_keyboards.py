@@ -3,26 +3,35 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import logging
 import validators
 
+
 def keyboards_start_user():
     logging.info("keyboards_start_user")
-    button_1 = KeyboardButton(text='Выбрать место')
-    button_2 = KeyboardButton(text='Задать вопрос')
+    button_1 = KeyboardButton(text='🎧Мероприятия недели')
+    button_2 = KeyboardButton(text='Выбрать место')
+    button_3 = KeyboardButton(text='Задать вопрос')
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[[button_1], [button_2],],
+        keyboard=[[button_1], [button_2], [button_3]],
         resize_keyboard=True
     )
     return keyboard
 
 
-
 def create_keyboard_list(list_name_button, str_callback):
+    """
+    Клавиатура списка категорий
+    :param list_name_button:
+    :param str_callback:
+    :return:
+    """
     logging.info("create_keyboard_list")
     kb_builder = InlineKeyboardBuilder()
     list_button = []
     for i, value in enumerate(list_name_button):
+        if 'Мероприятия недели' in value:
+            continue
         list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
     # Распаковываем список с кнопками в билдер методом row c параметром width
-    kb_builder.row(*list_button, width=1)
+    kb_builder.row(*list_button, width=2)
     # Возвращаем объект инлайн-клавиатуры
     return kb_builder.as_markup()
 
