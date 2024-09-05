@@ -13,6 +13,8 @@ def create_keyboard_list(list_name_button: list, str_callback: str, list_id_butt
             list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{value}'))
     else:
         for i, value in enumerate(list_name_button):
+            if 'Мероприятия недели' in value:
+                continue
             list_button.append(InlineKeyboardButton(text=value, callback_data=f'{str_callback}:{list_id_button[i]}'))
     # Распаковываем список с кнопками в билдер методом row c параметром width
     kb_builder.row(*list_button, width=1)
