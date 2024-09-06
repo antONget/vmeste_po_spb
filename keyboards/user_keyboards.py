@@ -67,6 +67,12 @@ def keyboard_get_more():
     return keyboard
 
 
+def keyboard_get_more_event():
+    logging.info("keyboard_get_more_event")
+    button_1 = InlineKeyboardButton(text='Покажите еще 3',  callback_data=f'get_more_event')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button_1]], )
+    return keyboard
+
 def keyboard_full_text(yandex, instagram):
     logging.info("keyboard_full_text")
     button_1 = ''
