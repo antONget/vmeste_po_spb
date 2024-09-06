@@ -12,7 +12,7 @@ from module.data_base import get_list_category, get_list_subcategory, get_list_c
     create_table_place, set_count_show_card, add_user, get_list_card_event
 from config_data.config import Config, load_config
 from keyboards.user_keyboards import keyboards_start_user, create_keyboard_list, keyboard_details, keyboard_full_text, \
-    keyboard_full_text_1, keyboard_get_more, create_keyboard_list_event
+    keyboard_full_text_1, keyboard_get_more, create_keyboard_list_event, keyboard_get_more_event
 from filter.admin_filter import chek_superadmin
 
 router = Router()
@@ -143,13 +143,44 @@ async def process_details(callback: CallbackQuery, state: FSMContext) -> None:
                                          parse_mode='html')
 
 
+async def show_card_event(message: Message, state: FSMContext, list_event: list) -> None:
+    logging.info(f'show_card_event: {message.chat.id}')
+    count_show = 3
+    user_dict[message.chat.id] = await state.get_data()
+    count_event_show = user_dict[message.chat.id]['count_event_show'] + count_show
+    await state.update_data(count_event_show=count_event_show)
+    for info_event in list_event[count_event_show - count_show:count_event_show]:
+        media = []
+        list_image = info_event[7].split(',')
+        for image in list_image:
+            # print(image)
+            media.append(InputMediaPhoto(media=image))
+        await message.answer_media_group(media=media)
+        await message.answer(text=f'<b>{info_event[1]}</b>\n{info_event[2]}',
+                             reply_markup=keyboard_details(info_event[0]),
+                             parse_mode='html')
+    if len(list_event) > count_event_show:
+        await message.answer(text='Не хватило мест?',
+                             reply_markup=keyboard_get_more_event())
+
+
 @router.message(F.text == '🎧Мероприятия недели')
-async def process_events_week(message: Message) -> None:
+async def process_events_week(message: Message, state: FSMContext) -> None:
     logging.info(f'process_events_week: {message.chat.id}')
     list_event: list = get_list_card_event()
-    print(list_event)
-    await message.answer(text=f'Выберите мероприятие',
-                         reply_markup=create_keyboard_list_event(list_name_button=list_event))
+    await state.update_data(list_event=list_event)
+    await state.update_data(count_event_show=0)
+    await show_card_event(message=message, state=state, list_event=list_event)
+    # await message.answer(text=f'Выберите мероприятие',
+    #                      reply_markup=create_keyboard_list_event(list_name_button=list_event))
+
+
+@router.callback_query(F.data == 'get_more_event')
+async def process_select_get_more_event(callback: CallbackQuery, state: FSMContext) -> None:
+    logging.info(f'process_select_get_more_event: {callback.message.chat.id}')
+    user_dict[callback.message.chat.id] = await state.get_data()
+    list_event = user_dict[callback.message.chat.id]['list_event']
+    await show_card_event(message=callback.message, state=state, list_event=list_event)
 
 
 @router.callback_query(F.data.startswith('event_'))
