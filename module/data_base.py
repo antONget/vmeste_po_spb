@@ -206,7 +206,10 @@ def set_position_card(category: str, subcategory: str, id_card: int):
     """
     logging.info(f'set_attribute_card')
     # получаем список карточек в выбранной категории и подкатегории
-    list_card_top = get_list_card(category, subcategory)
+    if subcategory == 'None':
+        list_card_top = get_list_card_event()
+    else:
+        list_card_top = get_list_card(category, subcategory)
     with db:
         sql = db.cursor()
         # обновляем позицию карточек
