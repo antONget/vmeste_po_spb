@@ -149,7 +149,7 @@ def get_list_card_event():
     logging.info(f'get_list_card_event')
     with db:
         sql = db.cursor()
-        list_card = [card for card in sql.execute('SELECT * FROM places WHERE category=? ORDER BY id',
+        list_card = [card for card in sql.execute('SELECT * FROM places WHERE category=? ORDER BY position',
                                                   ("🎧Мероприятия недели",)).fetchall()]
         return list_card
 
