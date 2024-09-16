@@ -153,9 +153,14 @@ async def process_update_card(message: Message, state: FSMContext) -> None:
         await message.answer(text='Пришлите новый адрес')
     elif message.text == 'Поднять в TOP':
         user_dict_admin[message.chat.id] = await state.get_data()
-        set_position_card(category=user_dict_admin[message.chat.id]['category'],
-                          subcategory=user_dict_admin[message.chat.id]['subcategory'],
-                          id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        if 'subcategory' in user_dict_admin[message.chat.id].keys():
+            set_position_card(category=user_dict_admin[message.chat.id]['category'],
+                              subcategory='None',
+                              id_card=int(user_dict_admin[message.chat.id]['id_card']))
+        else:
+            set_position_card(category=user_dict_admin[message.chat.id]['category'],
+                              subcategory=user_dict_admin[message.chat.id]['subcategory'],
+                              id_card=int(user_dict_admin[message.chat.id]['id_card']))
         await message.answer(text='Позиция карточки обновлена')
     # print(message.text)
 
